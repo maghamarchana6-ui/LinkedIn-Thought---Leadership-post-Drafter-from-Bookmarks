@@ -1,0 +1,293 @@
+{
+  "name": "LinkedIn Thought leadership post drafter from bookmarks",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "LinkedIn Thought-Ieadership Post Drafter",
+        "formDescription": "Enter an article URL to generate a LinkedIn thought-leadership post.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Article URL",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        -368,
+        -32
+      ],
+      "id": "6c0d7b0e-6346-4b48-8c24-d7eb87ed7097",
+      "name": "On form submission",
+      "webhookId": "10adb527-c6bb-4e9d-acee-35542cfdc68e"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json[\"Article URL\"] }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        -144,
+        -32
+      ],
+      "id": "2ca12090-801a-45dd-a6a0-1344b369b891",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "operation": "extractHtmlContent",
+        "extractionValues": {
+          "values": [
+            {
+              "key": "articleContent",
+              "cssSelector": "body"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "position": [
+        80,
+        -32
+      ],
+      "id": "a33054f2-87df-439f-847f-813476c4d053",
+      "name": "HTML"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "=You are an expert content analyst.\n\nYour task is to analyze the article content provided below for a LinkedIn Thought-Leadership Post Drafter.\n\nExtract only information that is supported by the article.\n\nIdentify:\n\n1. Main topic and core message\n2. 3–5 important facts or statistics\n3. 2–3 surprising or counter-intuitive insights\n4. Key lessons or takeaways for professionals\n5. Why this topic matters to a LinkedIn audience\n6. Useful context that can help create an engaging LinkedIn post\n\nDo not invent facts, statistics, quotes, or claims.\n\nDo not write the final LinkedIn post yet.\nReturn a clear, structured analysis that another AI step can use to draft the final LinkedIn post.\n\nARTICLE CONTENT:\n\n{{ $json.articleContent }}"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.3,
+      "position": [
+        240,
+        -32
+      ],
+      "id": "78ca466b-536e-4b61-ae44-9565e1cce251",
+      "name": "Message a model",
+      "credentials": {
+        "openAiApi": {
+          "id": null,
+          "name": "",
+          "__aiGatewayManaged": true
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "=You are an expert LinkedIn thought-leadership writer.\n\nUsing the article analysis provided below, create a professional LinkedIn thought-leadership post.\n\nRequirements:\n\n1. Start with a strong and interesting hook.\n2. Explain the main idea clearly.\n3. Include important statistics or facts from the analysis.\n4. Highlight at least one surprising or counter-intuitive insight.\n5. Add meaningful professional takeaways.\n6. Make the post engaging and easy to read.\n7. Use short paragraphs and natural language.\n8. End with a thoughtful question or discussion point.\n9. Add 3–5 relevant LinkedIn hashtags.\n10. Do not invent facts, statistics, quotes, or claims.\n11. Do not mention that AI was used to create the post.\n12. Do not include phrases like \"According to this prompt\" or \"Here is the post\".\n\nReturn ONLY the final LinkedIn post.\n\nARTICLE ANALYSIS:\n\n{{ $json.output[0].content[0].text }}"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.3,
+      "position": [
+        608,
+        -32
+      ],
+      "id": "e1408850-1a97-4c28-a30d-0cb2658211b5",
+      "name": "Message a model1",
+      "credentials": {
+        "openAiApi": {
+          "id": null,
+          "name": "",
+          "__aiGatewayManaged": true
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f05380f9-ea5e-4278-85ca-0cb398e20752",
+              "name": "=Linkedin_post",
+              "value": "={{ $json.output[0].content[0].text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        976,
+        -32
+      ],
+      "id": "93a15efa-1f40-48df-b25a-9f29014d3070",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1m7xA3_c-dtXzVhRgw0hz4LGVn_dBN2GFRyn4uc6fjgQ",
+          "mode": "list",
+          "cachedResultName": "Untitled spreadsheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1m7xA3_c-dtXzVhRgw0hz4LGVn_dBN2GFRyn4uc6fjgQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "LinkedIn Posts",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "LinkedIn_Posts": "={{ $json.Linkedin_post }}"
+          },
+          "matchingColumns": [
+            "LinkedIn_Posts"
+          ],
+          "schema": [
+            {
+              "id": "LinkedIn_Posts",
+              "displayName": "LinkedIn_Posts",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1200,
+        -32
+      ],
+      "id": "45c5acc3-62b9-4834-bcc9-c8f42752ab99",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "UAAjO48FKkhViEhQ",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "HTML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTML": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Message a model1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "36349a9e-1689-41aa-8941-198049bb015e",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "5dda406fe26ea05fe4878b359ba491eaa739bcc175f1f89aeb50d05d7c655e05"
+  },
+  "nodeGroups": [],
+  "id": "v2HnFxTczBkO7mhr",
+  "tags": []
+}
